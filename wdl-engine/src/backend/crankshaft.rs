@@ -614,6 +614,7 @@ impl TaskExecutionBackend for CrankshaftBackend {
     }
 }
 
+/// Get the current user and group IDs.
 #[cfg(target_os = "linux")]
 fn get_uid_gid() -> (u32, u32) {
     let uid = uzers::get_current_uid();
@@ -621,6 +622,7 @@ fn get_uid_gid() -> (u32, u32) {
     (uid, gid)
 }
 
+/// Get the current user and group IDs.
 #[cfg(not(target_os = "linux"))]
 fn get_uid_gid() -> (u32, u32) {
     (0, 0)
