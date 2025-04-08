@@ -524,7 +524,7 @@ impl TaskExecutionBackend for CrankshaftBackend {
                     .path(GUEST_OUT_DIR)
                     .contents(Contents::Path(output_path.clone()))
                     .ty(Type::Directory)
-                    // need write acces
+                    // need write access
                     .read_only(false)
                     .build();
 
