@@ -67,6 +67,15 @@ const GUEST_WORK_DIR: &str = "/mnt/work";
 /// The guest path for the command file.
 const GUEST_COMMAND_PATH: &str = "/mnt/command";
 
+/// The guest path for the output directory.
+const GUEST_OUT_DIR: &str = "/workflow_output";
+
+/// Amount of CPU to reserve for the cleanup task.
+const CLEANUP_CPU: f64 = 0.1;
+
+/// Amount of memory to reserve for the cleanup task.
+const CLEANUP_MEMORY: f64 = 0.05;
+
 /// Represents a crankshaft task request.
 ///
 /// This request contains the requested cpu and memory reservations for the task
@@ -500,8 +509,6 @@ impl TaskExecutionBackend for CrankshaftBackend {
                     ownership
                 );
 
-                let guest_out_dir = "/workflow_output";
-
                 if !output_path.exists() {
                     info!("output directory does not exist, skipping cleanup");
                     return Ok(());
@@ -514,7 +521,7 @@ impl TaskExecutionBackend for CrankshaftBackend {
                 }
 
                 let output_mount = Input::builder()
-                    .path(guest_out_dir)
+                    .path(GUEST_OUT_DIR)
                     .contents(Contents::Path(output_path.clone()))
                     .ty(Type::Directory)
                     // need write acces
@@ -530,7 +537,10 @@ impl TaskExecutionBackend for CrankshaftBackend {
                         .expect("generator should never be exhausted")
                 );
 
-                let cleanup_resources = Resources::builder().cpu(0.1).ram(0.05).build();
+                let cleanup_resources = Resources::builder()
+                    .cpu(CLEANUP_CPU)
+                    .ram(CLEANUP_MEMORY)
+                    .build();
 
                 let cleanup_task = Task::builder()
                     .name(&cleanup_task_name)
@@ -541,7 +551,7 @@ impl TaskExecutionBackend for CrankshaftBackend {
                             .args([
                                 "-R".to_string(),
                                 ownership.clone(),
-                                guest_out_dir.to_string(),
+                                GUEST_OUT_DIR.to_string(),
                             ])
                             .work_dir("/")
                             .build(),
